@@ -1,4 +1,4 @@
-import { asyncHandeler } from "../utils/asyncHandler.js"
+import asyncHandler from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
@@ -21,7 +21,7 @@ const generateAccessAndRefreshTokens = async(userId) => {
     }
 }
 
-const registerUser = asyncHandeler( async (req, res) => {
+const registerUser = asyncHandler( async (req, res) => {
     // get user details from frontend
     // validation - not empty
     // check if user already exists: username, email
@@ -34,7 +34,7 @@ const registerUser = asyncHandeler( async (req, res) => {
 
 
     const {fullName, email, username, password } = req.body
-    //console.log("email: ", email);
+    // console.log("email: ", email);
 
     if (
         [fullName, email, username, password].some((field) => field?.trim() === "")
@@ -96,7 +96,7 @@ const registerUser = asyncHandeler( async (req, res) => {
 
 } )
 
-const loginUser = asyncHandeler( async(req, res) => {
+const loginUser = asyncHandler( async(req, res) => {
     // req body => data
     // username or email
     // find the user
@@ -104,7 +104,10 @@ const loginUser = asyncHandeler( async(req, res) => {
     // access and refresh token
     // send cookie
     
-    const {email, username, password} = req.body
+    const { email, username, password } = req.body
+    console.log("email: ", email);
+    console.log("username: ", username);
+
 
     if (!username || !email) {
         throw new ApiError(400, "username or email is required")
@@ -119,6 +122,7 @@ const loginUser = asyncHandeler( async(req, res) => {
     }
 
     const isValidPassword = await user.isPasswordCorrect(password)
+    console.log(password);
 
     if (!isValidPassword) {
         throw new ApiError(401,"Password is wrong" )
@@ -149,7 +153,7 @@ const loginUser = asyncHandeler( async(req, res) => {
 
 })
 
-const logoutUser = asyncHandeler(async(req, res) => {
+const logoutUser = asyncHandler(async(req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -175,7 +179,7 @@ const logoutUser = asyncHandeler(async(req, res) => {
 
 })
 
-    const refreshAccessToken = asyncHandeler(async(req, res) => {
+    const refreshAccessToken = asyncHandler(async(req, res) => {
         const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
         if (incommingRefreshToken) {
