@@ -105,11 +105,11 @@ const loginUser = asyncHandler( async(req, res) => {
     // send cookie
     
     const { email, username, password } = req.body
-    console.log("email: ", email);
-    console.log("username: ", username);
+    // console.log("email: ", email);
+    // console.log("username: ", username);
 
 
-    if (!username || !email) {
+    if (!username && !email) {
         throw new ApiError(400, "username or email is required")
     }
 
@@ -122,13 +122,15 @@ const loginUser = asyncHandler( async(req, res) => {
     }
 
     const isValidPassword = await user.isPasswordCorrect(password)
-    console.log(password);
+    // console.log(password);
 
     if (!isValidPassword) {
         throw new ApiError(401,"Password is wrong" )
     }
 
     const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+    // console.log(accessToken);
+    // console.log(refreshToken);
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
@@ -182,7 +184,7 @@ const logoutUser = asyncHandler(async(req, res) => {
     const refreshAccessToken = asyncHandler(async(req, res) => {
         const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
-        if (incommingRefreshToken) {
+        if (!incommingRefreshToken) {
             throw new ApiError(401, "unauthorized request")
         }
     try {
